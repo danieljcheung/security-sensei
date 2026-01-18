@@ -1,1 +1,1 @@
-"""Tests for Security Sensei."""
+"""Security Sensei test suite."""
