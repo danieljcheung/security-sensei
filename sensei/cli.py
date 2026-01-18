@@ -707,5 +707,23 @@ def version():
     print_banner(quiet=False)
 
 
+@cli.command()
+@click.option(
+    "--slow",
+    is_flag=True,
+    help="Slower animations for GIF recording"
+)
+@click.option(
+    "--json",
+    "show_json",
+    is_flag=True,
+    help="Show JSON output example at end"
+)
+def demo(slow, show_json):
+    """Run a showcase demo for screenshots/recording."""
+    from sensei.demo import run_demo
+    run_demo(slow=slow, show_json=show_json)
+
+
 if __name__ == "__main__":
     cli()
