@@ -1,0 +1,154 @@
+{
+  "vulnerabilities": [
+    {
+      "package": "lodash",
+      "vulnerable_versions": "<4.17.21",
+      "cve": "CVE-2021-23337",
+      "cvss": 7.2,
+      "severity": "HIGH",
+      "title": "Command Injection in lodash",
+      "description": "Lodash versions prior to 4.17.21 are vulnerable to Command Injection via the template function.",
+      "fixed_version": "4.17.21"
+    },
+    {
+      "package": "lodash",
+      "vulnerable_versions": "<4.17.19",
+      "cve": "CVE-2020-8203",
+      "cvss": 7.4,
+      "severity": "HIGH",
+      "title": "Prototype Pollution in lodash",
+      "description": "Prototype pollution vulnerability in lodash before 4.17.19 allows attackers to modify Object.prototype.",
+      "fixed_version": "4.17.19"
+    },
+    {
+      "package": "axios",
+      "vulnerable_versions": "<1.6.0",
+      "cve": "CVE-2023-45857",
+      "cvss": 6.5,
+      "severity": "MEDIUM",
+      "title": "CSRF Vulnerability in axios",
+      "description": "Axios before 1.6.0 inadvertently exposes the confidential XSRF-TOKEN stored in cookies.",
+      "fixed_version": "1.6.0"
+    },
+    {
+      "package": "axios",
+      "vulnerable_versions": "<0.21.1",
+      "cve": "CVE-2020-28168",
+      "cvss": 5.9,
+      "severity": "MEDIUM",
+      "title": "Server-Side Request Forgery in axios",
+      "description": "Axios before 0.21.1 is vulnerable to SSRF via a crafted URL.",
+      "fixed_version": "0.21.1"
+    },
+    {
+      "package": "minimist",
+      "vulnerable_versions": "<1.2.6",
+      "cve": "CVE-2021-44906",
+      "cvss": 9.8,
+      "severity": "CRITICAL",
+      "title": "Prototype Pollution in minimist",
+      "description": "Minimist before 1.2.6 is vulnerable to Prototype Pollution via the setKey function.",
+      "fixed_version": "1.2.6"
+    },
+    {
+      "package": "node-fetch",
+      "vulnerable_versions": "<2.6.7",
+      "cve": "CVE-2022-0235",
+      "cvss": 6.1,
+      "severity": "MEDIUM",
+      "title": "Exposure of Sensitive Information in node-fetch",
+      "description": "node-fetch before 2.6.7 is vulnerable to exposure of sensitive information via cookies.",
+      "fixed_version": "2.6.7"
+    },
+    {
+      "package": "express",
+      "vulnerable_versions": "<4.19.2",
+      "cve": "CVE-2024-29041",
+      "cvss": 6.1,
+      "severity": "MEDIUM",
+      "title": "Open Redirect in express",
+      "description": "Express before 4.19.2 is vulnerable to open redirect attacks via malformed URLs.",
+      "fixed_version": "4.19.2"
+    },
+    {
+      "package": "jsonwebtoken",
+      "vulnerable_versions": "<9.0.0",
+      "cve": "CVE-2022-23529",
+      "cvss": 7.6,
+      "severity": "HIGH",
+      "title": "Insecure Default in jsonwebtoken",
+      "description": "jsonwebtoken before 9.0.0 allows attackers to bypass secret validation via jwt.verify().",
+      "fixed_version": "9.0.0"
+    },
+    {
+      "package": "shell-quote",
+      "vulnerable_versions": "<1.7.3",
+      "cve": "CVE-2021-42740",
+      "cvss": 9.8,
+      "severity": "CRITICAL",
+      "title": "Command Injection in shell-quote",
+      "description": "shell-quote before 1.7.3 is vulnerable to command injection via untrusted input.",
+      "fixed_version": "1.7.3"
+    },
+    {
+      "package": "moment",
+      "vulnerable_versions": "<2.29.4",
+      "cve": "CVE-2022-31129",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "title": "ReDoS in moment",
+      "description": "Moment.js before 2.29.4 is vulnerable to Regular Expression Denial of Service.",
+      "fixed_version": "2.29.4"
+    },
+    {
+      "package": "tar",
+      "vulnerable_versions": "<6.1.9",
+      "cve": "CVE-2021-37712",
+      "cvss": 8.6,
+      "severity": "HIGH",
+      "title": "Arbitrary File Creation in tar",
+      "description": "tar before 6.1.9 is vulnerable to arbitrary file creation via symlink attacks.",
+      "fixed_version": "6.1.9"
+    },
+    {
+      "package": "semver",
+      "vulnerable_versions": "<7.5.2",
+      "cve": "CVE-2022-25883",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "title": "ReDoS in semver",
+      "description": "semver before 7.5.2 is vulnerable to Regular Expression Denial of Service.",
+      "fixed_version": "7.5.2"
+    },
+    {
+      "package": "qs",
+      "vulnerable_versions": "<6.10.3",
+      "cve": "CVE-2022-24999",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "title": "Prototype Pollution in qs",
+      "description": "qs before 6.10.3 is vulnerable to Prototype Pollution via the parse function.",
+      "fixed_version": "6.10.3"
+    },
+    {
+      "package": "got",
+      "vulnerable_versions": "<11.8.5",
+      "cve": "CVE-2022-33987",
+      "cvss": 5.3,
+      "severity": "MEDIUM",
+      "title": "SSRF in got",
+      "description": "got before 11.8.5 is vulnerable to server-side request forgery via redirect handling.",
+      "fixed_version": "11.8.5"
+    },
+    {
+      "package": "json5",
+      "vulnerable_versions": "<2.2.2",
+      "cve": "CVE-2022-46175",
+      "cvss": 7.1,
+      "severity": "HIGH",
+      "title": "Prototype Pollution in json5",
+      "description": "json5 before 2.2.2 is vulnerable to Prototype Pollution via the parse method.",
+      "fixed_version": "2.2.2"
+    }
+  ]
+}

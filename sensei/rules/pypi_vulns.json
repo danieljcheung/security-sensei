@@ -1,0 +1,154 @@
+{
+  "vulnerabilities": [
+    {
+      "package": "requests",
+      "vulnerable_versions": "<2.31.0",
+      "cve": "CVE-2023-32681",
+      "cvss": 6.1,
+      "severity": "MEDIUM",
+      "title": "Information Disclosure in requests",
+      "description": "Requests before 2.31.0 leaks Proxy-Authorization headers to destination servers during HTTPS redirects.",
+      "fixed_version": "2.31.0"
+    },
+    {
+      "package": "urllib3",
+      "vulnerable_versions": "<2.0.6",
+      "cve": "CVE-2023-45803",
+      "cvss": 4.2,
+      "severity": "MEDIUM",
+      "title": "Cookie Leakage in urllib3",
+      "description": "urllib3 before 2.0.6 may leak Cookie header content during cross-origin redirects.",
+      "fixed_version": "2.0.6"
+    },
+    {
+      "package": "urllib3",
+      "vulnerable_versions": "<1.26.5",
+      "cve": "CVE-2021-33503",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "title": "ReDoS in urllib3",
+      "description": "urllib3 before 1.26.5 is vulnerable to Regular Expression Denial of Service.",
+      "fixed_version": "1.26.5"
+    },
+    {
+      "package": "pyyaml",
+      "vulnerable_versions": "<5.4",
+      "cve": "CVE-2020-14343",
+      "cvss": 9.8,
+      "severity": "CRITICAL",
+      "title": "Arbitrary Code Execution in PyYAML",
+      "description": "PyYAML before 5.4 allows arbitrary code execution via yaml.load() with untrusted input.",
+      "fixed_version": "5.4"
+    },
+    {
+      "package": "pillow",
+      "vulnerable_versions": "<10.0.1",
+      "cve": "CVE-2023-44271",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "title": "Denial of Service in Pillow",
+      "description": "Pillow before 10.0.1 is vulnerable to DoS via a crafted image with extreme dimensions.",
+      "fixed_version": "10.0.1"
+    },
+    {
+      "package": "pillow",
+      "vulnerable_versions": "<9.0.0",
+      "cve": "CVE-2022-22817",
+      "cvss": 9.8,
+      "severity": "CRITICAL",
+      "title": "Code Injection in Pillow",
+      "description": "Pillow before 9.0.0 allows code injection via PIL.ImageMath.eval.",
+      "fixed_version": "9.0.0"
+    },
+    {
+      "package": "cryptography",
+      "vulnerable_versions": "<41.0.4",
+      "cve": "CVE-2023-49083",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "title": "NULL Pointer Dereference in cryptography",
+      "description": "cryptography before 41.0.4 has a NULL pointer dereference when loading PKCS#7 certificates.",
+      "fixed_version": "41.0.4"
+    },
+    {
+      "package": "django",
+      "vulnerable_versions": "<4.2.7",
+      "cve": "CVE-2023-46695",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "title": "Denial of Service in Django",
+      "description": "Django before 4.2.7 is vulnerable to DoS via a large number of characters in username during auth.",
+      "fixed_version": "4.2.7"
+    },
+    {
+      "package": "flask",
+      "vulnerable_versions": "<2.3.2",
+      "cve": "CVE-2023-30861",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "title": "Cookie Exposure in Flask",
+      "description": "Flask before 2.3.2 may expose session cookie in response body under certain conditions.",
+      "fixed_version": "2.3.2"
+    },
+    {
+      "package": "jinja2",
+      "vulnerable_versions": "<3.1.3",
+      "cve": "CVE-2024-22195",
+      "cvss": 6.1,
+      "severity": "MEDIUM",
+      "title": "XSS in Jinja2",
+      "description": "Jinja2 before 3.1.3 is vulnerable to XSS via xmlattr filter with crafted input.",
+      "fixed_version": "3.1.3"
+    },
+    {
+      "package": "werkzeug",
+      "vulnerable_versions": "<3.0.1",
+      "cve": "CVE-2023-46136",
+      "cvss": 7.5,
+      "severity": "HIGH",
+      "title": "Denial of Service in Werkzeug",
+      "description": "Werkzeug before 3.0.1 is vulnerable to resource consumption via multipart form data.",
+      "fixed_version": "3.0.1"
+    },
+    {
+      "package": "sqlalchemy",
+      "vulnerable_versions": "<2.0.0b1",
+      "cve": "CVE-2022-31799",
+      "cvss": 5.3,
+      "severity": "MEDIUM",
+      "title": "SQL Injection in SQLAlchemy",
+      "description": "SQLAlchemy before 2.0.0b1 has potential SQL injection in limit/offset clauses.",
+      "fixed_version": "2.0.0"
+    },
+    {
+      "package": "paramiko",
+      "vulnerable_versions": "<3.4.0",
+      "cve": "CVE-2023-48795",
+      "cvss": 5.9,
+      "severity": "MEDIUM",
+      "title": "Terrapin Attack in Paramiko",
+      "description": "Paramiko before 3.4.0 is vulnerable to the Terrapin SSH prefix truncation attack.",
+      "fixed_version": "3.4.0"
+    },
+    {
+      "package": "aiohttp",
+      "vulnerable_versions": "<3.9.0",
+      "cve": "CVE-2023-49081",
+      "cvss": 5.3,
+      "severity": "MEDIUM",
+      "title": "CRLF Injection in aiohttp",
+      "description": "aiohttp before 3.9.0 is vulnerable to CRLF injection via HTTP request smuggling.",
+      "fixed_version": "3.9.0"
+    },
+    {
+      "package": "certifi",
+      "vulnerable_versions": "<2023.7.22",
+      "cve": "CVE-2023-37920",
+      "cvss": 9.8,
+      "severity": "CRITICAL",
+      "title": "Untrusted Root Certificate in certifi",
+      "description": "certifi before 2023.7.22 includes the e-Tugra root certificate which was compromised.",
+      "fixed_version": "2023.7.22"
+    }
+  ]
+}
