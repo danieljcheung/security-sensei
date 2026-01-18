@@ -47,9 +47,14 @@ def cli():
     is_flag=True,
     help="Show verbose output"
 )
-def scan(path, output, severity, category, include_baselined, verbose):
+@click.option(
+    "--include-git-history",
+    is_flag=True,
+    help="Scan git history for secrets (catches deleted but still exploitable secrets)"
+)
+def scan(path, output, severity, category, include_baselined, verbose, include_git_history):
     """Scan a project for security vulnerabilities."""
-    config = {"verbose": verbose}
+    config = {"verbose": verbose, "include_git_history": include_git_history}
 
     # Convert severity to uppercase for internal use
     min_severity = severity.upper() if severity else None
@@ -145,6 +150,14 @@ def _print_finding(finding, verbose: bool = False) -> None:
     if finding.line_number:
         location += f":{finding.line_number}"
     click.echo(location)
+
+    # Historical finding info (from git history)
+    metadata = finding.metadata or {}
+    if metadata.get("historical"):
+        commit = metadata.get("commit", "unknown")
+        deleted = metadata.get("deleted", False)
+        status = "deleted from current files" if deleted else "still present"
+        click.echo(click.style(f"  Git: commit {commit} ({status})", fg="magenta"))
 
     # Code snippet
     if finding.code_snippet and verbose:
