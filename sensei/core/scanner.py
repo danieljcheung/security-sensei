@@ -5,7 +5,8 @@ from __future__ import annotations
 import importlib
 import pkgutil
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Type
 
@@ -27,6 +28,13 @@ class ScanResult:
     scanners_run: List[str]
     auto_fixes_applied: int = 0
     baselined_count: int = 0
+    baselined_ids: List[str] = field(default_factory=list)
+    scan_timestamp: Optional[str] = None
+
+    def __post_init__(self):
+        """Set scan timestamp if not provided."""
+        if self.scan_timestamp is None:
+            self.scan_timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     @property
     def total_findings(self) -> int:
@@ -49,18 +57,31 @@ class ScanResult:
         return counts
 
     def to_dict(self) -> Dict:
-        """Convert scan result to dictionary."""
+        """Convert scan result to dictionary for JSON serialization.
+
+        Returns a structured dictionary matching the expected JSON schema.
+        """
+        by_severity = self.findings_by_severity
         return {
-            "findings": [f.to_dict() for f in self.findings],
-            "project_info": self.project_info,
-            "scan_time": self.scan_time,
-            "scanners_run": self.scanners_run,
-            "auto_fixes_applied": self.auto_fixes_applied,
-            "baselined_count": self.baselined_count,
+            "scan_time": self.scan_timestamp,
+            "duration_seconds": round(self.scan_time, 3),
+            "project": {
+                "path": self.project_info.get("path", ""),
+                "languages": self.project_info.get("languages", []),
+                "frameworks": self.project_info.get("frameworks", []),
+                "package_managers": self.project_info.get("package_managers", []),
+            },
             "summary": {
                 "total": self.total_findings,
-                "by_severity": self.findings_by_severity,
+                "critical": by_severity.get(Severity.CRITICAL, 0),
+                "high": by_severity.get(Severity.HIGH, 0),
+                "medium": by_severity.get(Severity.MEDIUM, 0),
+                "low": by_severity.get(Severity.LOW, 0),
+                "info": by_severity.get(Severity.INFO, 0),
             },
+            "findings": [f.to_dict() for f in self.findings],
+            "baselined": self.baselined_ids,
+            "scanners_run": self.scanners_run,
         }
 
 
@@ -172,10 +193,11 @@ class SenseiScanner:
                 seen_ids.add(finding.id)
                 unique_findings.append(finding)
 
-        # Track baselined count before filtering
-        baselined_count = sum(
-            1 for f in unique_findings if self.baseline_manager.is_baselined(f.id)
-        )
+        # Track baselined findings before filtering
+        baselined_ids = [
+            f.id for f in unique_findings if self.baseline_manager.is_baselined(f.id)
+        ]
+        baselined_count = len(baselined_ids)
 
         # Filter out baselined findings unless requested
         if not include_baselined:
@@ -203,12 +225,16 @@ class SenseiScanner:
 
         scan_time = time.time() - start_time
 
+        # Add project path to project_info
+        project_info["path"] = str(self.project_path)
+
         return ScanResult(
             findings=unique_findings,
             project_info=project_info,
             scan_time=scan_time,
             scanners_run=scanners_run,
             baselined_count=baselined_count,
+            baselined_ids=baselined_ids,
         )
 
     def get_available_scanners(self) -> List[Dict]:
