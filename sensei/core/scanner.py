@@ -140,6 +140,7 @@ class SenseiScanner:
         categories: Optional[List[str]] = None,
         min_severity: Optional[str] = None,
         include_baselined: bool = False,
+        progress_callback: Optional[callable] = None,
     ) -> ScanResult:
         """Run a security scan on the project.
 
@@ -148,6 +149,9 @@ class SenseiScanner:
                        If None, runs all applicable scanners.
             min_severity: Minimum severity level to include in results.
             include_baselined: Whether to include baselined findings.
+            progress_callback: Optional callback function for progress updates.
+                              Called with (event_type, data) where event_type is one of:
+                              'project_analyzed', 'scanner_start', 'scanner_complete', 'scanner_error'
 
         Returns:
             ScanResult containing all findings and metadata.
@@ -158,6 +162,14 @@ class SenseiScanner:
         project_info = self.project_analyzer.analyze()
         languages = project_info["languages"]
         frameworks = project_info["frameworks"]
+
+        # Notify progress callback
+        if progress_callback:
+            progress_callback('project_analyzed', {
+                'languages': languages,
+                'frameworks': frameworks,
+                'package_managers': project_info.get('package_managers', []),
+            })
 
         # Initialize scanners and filter by applicability
         applicable_scanners: List[Any] = []
@@ -177,12 +189,26 @@ class SenseiScanner:
         scanners_run: List[str] = []
 
         for scanner in applicable_scanners:
+            if progress_callback:
+                progress_callback('scanner_start', {'name': scanner.name})
+
             try:
                 findings = scanner.scan()
                 all_findings.extend(findings)
                 scanners_run.append(scanner.name)
+
+                if progress_callback:
+                    progress_callback('scanner_complete', {
+                        'name': scanner.name,
+                        'findings_count': len(findings),
+                    })
             except Exception as e:
-                if self.config.get("verbose"):
+                if progress_callback:
+                    progress_callback('scanner_error', {
+                        'name': scanner.name,
+                        'error': str(e),
+                    })
+                elif self.config.get("verbose"):
                     print(f"Warning: Scanner {scanner.name} failed: {e}")
 
         # Deduplicate findings by ID
