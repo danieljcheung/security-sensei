@@ -1,0 +1,31 @@
+# Intentionally vulnerable dependencies for security testing
+
+# VULNERABLE: CVE-2021-33503 - ReDoS vulnerability
+requests==2.25.0
+
+# VULNERABLE: CVE-2020-14343 - Arbitrary code execution
+pyyaml==5.3
+
+# VULNERABLE: CVE-2021-23727 - ReDoS vulnerability
+celery==5.0.0
+
+# VULNERABLE: CVE-2019-16865 - DoS via memory exhaustion
+pillow==6.2.0
+
+# VULNERABLE: CVE-2021-28363 - SSRF/Redirect vulnerability
+urllib3==1.25.0
+
+# VULNERABLE: CVE-2020-5312 - Buffer overflow
+flask==1.0.0
+
+# VULNERABLE: CVE-2021-23336 - Web cache poisoning
+django==2.2.0
+
+# VULNERABLE: CVE-2022-21699 - Code injection
+ipython==7.16.0
+
+# VULNERABLE: CVE-2019-20477 - XXE vulnerability
+lxml==4.3.0
+
+# VULNERABLE: CVE-2018-14574 - Open redirect
+paramiko==2.4.0

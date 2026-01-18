@@ -1,0 +1,29 @@
+{
+  "name": "vulnerable-node-app",
+  "version": "1.0.0",
+  "description": "Intentionally vulnerable Node.js app for security testing",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "4.17.0",
+    "lodash": "4.17.0",
+    "axios": "0.21.0",
+    "jsonwebtoken": "8.5.0",
+    "mysql": "2.18.0",
+    "mongoose": "5.10.0",
+    "node-serialize": "0.0.4",
+    "js-yaml": "3.13.0",
+    "minimist": "1.2.0",
+    "handlebars": "4.5.0",
+    "marked": "0.6.0",
+    "tar": "4.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.0"
+  },
+  "keywords": ["vulnerable", "security", "testing"],
+  "author": "Security Sensei",
+  "license": "MIT"
+}
