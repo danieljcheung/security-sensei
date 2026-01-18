@@ -15,83 +15,35 @@ sensei scan ./my-project
 
 ---
 
+## Demo
+
+![Security Sensei Demo](sensei-demo.gif)
+
+---
+
 ## What Makes This Different
 
 Most security scanners give you a list of problems. Security Sensei gives you an education.
-
-**The hybrid approach:** Deterministic scanning finds the vulnerabilities. AI-powered analysis teaches you why they matter.
 
 For every finding, Sensei provides:
 
 - **What it is** — Clear explanation of the vulnerability type
 - **Why it's dangerous** — Real attack scenarios showing how it could be exploited
 - **How to fix it** — Concrete code examples, not just generic advice
-- **Certification mapping** — Links to Security+, CEH, and OWASP standards
+- **CWE & OWASP mapping** — Links to industry standards for deeper learning
 
 This isn't just a tool—it's a learning experience that makes you a better developer.
 
 ---
 
-## Demo
-
-```
-$ sensei scan ./my-app
-
-Security Sensei v0.1.0
-Scanning: ./my-app
-Languages detected: python, javascript
-Frameworks detected: fastapi, react
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-[CRITICAL] Hardcoded API Key Found
-  File: src/config.py:23
-  Code: OPENAI_KEY = "sk-proj-abc123..."
-
-  CWE-798 | OWASP A01:2021 - Broken Access Control
-
-  Why this matters:
-  An attacker who gains access to your repository (via leak, insider threat,
-  or compromised CI) can extract this key and make API calls on your behalf.
-  For OpenAI keys, this could mean thousands of dollars in charges.
-
-  Fix: Move to environment variables
-  - export OPENAI_KEY="sk-proj-..."
-  + OPENAI_KEY = os.environ.get("OPENAI_KEY")
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-[HIGH] SQL Injection Vulnerability
-  File: api/users.py:47
-  Code: cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
-
-  CWE-89 | OWASP A03:2021 - Injection
-
-  Attack scenario:
-  If user_id = "1; DROP TABLE users; --", this query becomes:
-  SELECT * FROM users WHERE id = 1; DROP TABLE users; --
-  Your entire users table is now gone.
-
-  Fix: Use parameterized queries
-  - cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
-  + cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Scan complete: 2 critical, 1 high, 3 medium, 5 low
-```
-
----
-
 ## Features
 
-| Category | What It Catches | Languages |
-|----------|-----------------|-----------|
+| Scanner | What It Catches | Languages |
+|---------|-----------------|-----------|
 | **Secrets** | API keys, tokens, passwords, private keys, secrets in git history | All |
-| **Dependencies** | Known CVEs, outdated packages, typosquatting attacks | Python, Node.js |
-| **Code** | SQL injection, XSS, command injection, path traversal | Python, JavaScript, Swift |
-| **Config** | Debug mode enabled, permissive CORS, default credentials | All |
-| **iOS** | ATS exceptions, Keychain misuse, Info.plist issues | Swift |
+| **Code** | SQL injection, XSS, command injection, path traversal, insecure deserialization | Python, JavaScript |
+| **Config** | Debug mode enabled, permissive CORS, default credentials, insecure settings | All |
+| **Dependencies** | Known CVEs, outdated packages, vulnerable dependencies | Python, Node.js |
 | **Web** | localStorage tokens, missing security headers, eval() usage | JavaScript/TypeScript |
 | **Deployment** | Dockerfile issues, CI/CD misconfigs, missing .gitignore entries | All |
 
@@ -117,39 +69,46 @@ pip install -e ".[dev]"
 
 ### Basic Scan
 ```bash
-sensei scan .
-sensei scan ./src --severity high
+sensei scan .                        # Scan current directory
+sensei scan ./src --severity high    # Only show high+ severity
+sensei scan . --category secrets     # Run specific scanner
+sensei scan . --verbose              # Show code snippets
 ```
 
-### JSON Output (for CI/CD)
+### Output Formats
 ```bash
-sensei scan . --format json > results.json
-sensei scan . --format sarif > results.sarif
+sensei scan . --output json          # JSON output for CI/CD
+sensei scan . --output markdown      # Markdown report
+sensei scan . --quiet                # Minimal output for scripts
 ```
 
-### Include Git History
+### Git History Scanning
 Scan for secrets that were committed and later removed:
 ```bash
-sensei scan . --include-history
+sensei scan . --include-git-history
 ```
 
-### Baseline Accepted Risks
-Mark known issues as accepted so they don't fail your build:
-```bash
-# Accept a specific finding
-sensei baseline --accept abc123def
-
-# View current baseline
-sensei baseline --list
-
-# Clear baseline
-sensei baseline --clear
-```
-
-### Auto-Fix Safe Issues
+### Auto-Fix
 Let Sensei fix simple issues automatically:
 ```bash
-sensei scan . --fix
+sensei scan . --fix                  # Apply safe auto-fixes
+sensei scan . --fix --dry-run        # Preview fixes without applying
+```
+
+### Baseline Management
+Mark known issues as accepted so they don't fail your build:
+```bash
+sensei baseline --add ID "reason"    # Accept a finding
+sensei baseline --list               # View baseline
+sensei baseline --remove ID          # Remove from baseline
+sensei baseline --clear              # Clear all
+```
+
+### Demo Mode
+Run a showcase demo for recordings or screenshots:
+```bash
+sensei demo                          # Run demo
+sensei demo --slow                   # Slower for GIF recording
 ```
 
 ---
@@ -160,7 +119,7 @@ Security Sensei's JSON output is designed to feed directly into Claude for deepe
 
 ```bash
 # Generate findings
-sensei scan . --format json > findings.json
+sensei scan . --output json > findings.json
 
 # Ask Claude to explain
 claude "Explain the SQL injection finding in findings.json and show me 3 ways an attacker could exploit it"
@@ -200,21 +159,22 @@ jobs:
         run: pip install security-sensei
 
       - name: Run Security Scan
-        run: sensei scan . --format sarif --output results.sarif
+        run: sensei scan . --output json > results.json
 
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: results.sarif
+          name: security-scan-results
+          path: results.json
 ```
 
 ### Exit Codes
 
 | Code | Meaning |
 |------|---------|
-| `0` | No issues found (or all issues baselined) |
-| `1` | Security issues found |
-| `2` | Scanner error (invalid config, etc.) |
+| `0` | No critical or high severity findings |
+| `1` | High severity findings found |
+| `2` | Critical severity findings found |
 
 ---
 
@@ -233,10 +193,13 @@ Security Sensei is the tool I wished I had when I started learning application s
 
 ## Roadmap
 
-- [ ] More language support (Go, Rust, Java)
+- [x] Auto-fix capabilities
+- [x] Baseline management for accepted risks
+- [x] Git history scanning
+- [x] JSON and Markdown output formats
 - [ ] SARIF output for GitHub Security tab
+- [ ] More language support (Go, Rust, Java)
 - [ ] VS Code extension
-- [ ] More auto-fix capabilities
 - [ ] Container image scanning
 - [ ] Infrastructure as Code scanning (Terraform, CloudFormation)
 
