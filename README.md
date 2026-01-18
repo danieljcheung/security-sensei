@@ -106,7 +106,7 @@ pip install security-sensei
 
 **For development:**
 ```bash
-git clone https://github.com/yourusername/security-sensei.git
+git clone https://github.com/danieljcheung/security-sensei.git
 cd security-sensei
 pip install -e ".[dev]"
 ```
@@ -250,7 +250,7 @@ Contributions are welcome! Whether it's:
 - Improving documentation
 - Fixing bugs
 
-Check out the [open issues](https://github.com/yourusername/security-sensei/issues) or open a new one.
+Check out the [open issues](https://github.com/danieljcheung/security-sensei/issues) or open a new one.
 
 ---
 
