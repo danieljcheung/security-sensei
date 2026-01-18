@@ -9,6 +9,7 @@ from sensei import __version__
 from sensei.core.scanner import SenseiScanner, ScanResult
 from sensei.core.finding import Finding, Severity
 from sensei.core.baseline import BaselineManager
+from sensei.fixes import AutoFixer, ProposedFix, AppliedFix
 
 
 # Color scheme for severity levels
@@ -70,7 +71,17 @@ def cli():
     is_flag=True,
     help="Scan git history for secrets (catches deleted but still exploitable secrets)"
 )
-def scan(path, output, severity, category, include_baselined, verbose, include_git_history):
+@click.option(
+    "--fix",
+    is_flag=True,
+    help="Apply safe, reversible auto-fixes for detected issues"
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Show what fixes would be applied without making changes (use with --fix)"
+)
+def scan(path, output, severity, category, include_baselined, verbose, include_git_history, fix, dry_run):
     """Scan a project for security vulnerabilities."""
     config = {"verbose": verbose, "include_git_history": include_git_history}
 
@@ -88,13 +99,28 @@ def scan(path, output, severity, category, include_baselined, verbose, include_g
         include_baselined=include_baselined,
     )
 
+    # Handle auto-fix if requested
+    applied_fixes = []
+    proposed_fixes = []
+    if fix or dry_run:
+        auto_fixer = AutoFixer(path)
+        proposed_fixes = auto_fixer.analyze(result.findings)
+
+        if proposed_fixes:
+            if dry_run:
+                # Just show what would be done
+                _output_proposed_fixes(proposed_fixes)
+            else:
+                # Apply the fixes
+                applied_fixes = auto_fixer.apply(proposed_fixes)
+
     # Output results
     if output == "json":
-        _output_json(result)
+        _output_json(result, applied_fixes)
     elif output == "markdown":
-        _output_markdown(result, verbose)
+        _output_markdown(result, verbose, applied_fixes)
     else:
-        _output_text(result, verbose)
+        _output_text(result, verbose, applied_fixes)
 
     # Exit with appropriate code
     if result.total_findings > 0:
@@ -105,12 +131,15 @@ def scan(path, output, severity, category, include_baselined, verbose, include_g
     sys.exit(0)
 
 
-def _output_json(result: ScanResult) -> None:
+def _output_json(result: ScanResult, applied_fixes: list = None) -> None:
     """Output scan results as JSON."""
-    click.echo(json.dumps(result.to_dict(), indent=2))
+    output = result.to_dict()
+    if applied_fixes:
+        output["applied_fixes"] = [fix.to_dict() for fix in applied_fixes]
+    click.echo(json.dumps(output, indent=2))
 
 
-def _output_text(result: ScanResult, verbose: bool = False) -> None:
+def _output_text(result: ScanResult, verbose: bool = False, applied_fixes: list = None) -> None:
     """Output scan results as formatted text with colors."""
     # Header
     click.echo("")
@@ -173,6 +202,49 @@ def _output_text(result: ScanResult, verbose: bool = False) -> None:
     if result.total_findings > 0:
         click.echo("")
         _print_summary_box(by_severity)
+
+    # Applied fixes
+    if applied_fixes:
+        click.echo("")
+        _print_applied_fixes(applied_fixes)
+
+
+def _output_proposed_fixes(proposed_fixes: list) -> None:
+    """Output proposed fixes in dry-run mode."""
+    click.echo("")
+    click.echo(click.style("Proposed Fixes (Dry Run)", fg="bright_blue", bold=True))
+    click.echo(click.style("-" * 50, fg="bright_black"))
+    click.echo("")
+
+    for fix in proposed_fixes:
+        click.echo(click.style(f"[{fix.fix_type}]", fg="green", bold=True) + f" {fix.description}")
+        click.echo(click.style(f"  File: {fix.file_path}", fg="bright_black"))
+        click.echo("")
+        click.echo(click.style("  Preview:", fg="cyan"))
+        for line in fix.preview.split("\n"):
+            click.echo(click.style(f"    {line}", fg="bright_black"))
+        click.echo("")
+
+    click.echo(click.style("-" * 50, fg="bright_black"))
+    click.echo(f"Total: {len(proposed_fixes)} fix(es) would be applied")
+    click.echo(click.style("Run without --dry-run to apply these fixes", fg="yellow"))
+
+
+def _print_applied_fixes(applied_fixes: list) -> None:
+    """Print applied fixes summary."""
+    click.echo(click.style("Applied Fixes", fg="green", bold=True))
+    click.echo(click.style("-" * 50, fg="bright_black"))
+
+    for fix in applied_fixes:
+        click.echo(click.style(f"[OK]", fg="green", bold=True) + f" {fix.description}")
+        click.echo(click.style(f"  File: {fix.file_path}", fg="bright_black"))
+        click.echo(click.style(f"  Changes: {fix.changes_made}", fg="bright_black"))
+        if fix.backup_path:
+            click.echo(click.style(f"  Backup: {fix.backup_path}", fg="bright_black"))
+        click.echo("")
+
+    click.echo(click.style("-" * 50, fg="bright_black"))
+    click.echo(click.style(f"Applied {len(applied_fixes)} fix(es)", fg="green"))
 
 
 def _print_finding(finding: Finding, verbose: bool = False) -> None:
@@ -243,7 +315,7 @@ def _print_summary_box(by_severity: dict) -> None:
     click.echo(click.style("+-----------------------------+", fg="bright_black"))
 
 
-def _output_markdown(result: ScanResult, verbose: bool = False) -> None:
+def _output_markdown(result: ScanResult, verbose: bool = False, applied_fixes: list = None) -> None:
     """Output scan results as Markdown."""
     # Header
     click.echo(f"# Security Scan Report")
@@ -303,6 +375,22 @@ def _output_markdown(result: ScanResult, verbose: bool = False) -> None:
 
             for finding in severity_findings:
                 _print_finding_markdown(finding, verbose)
+
+    # Applied fixes section
+    if applied_fixes:
+        click.echo("")
+        click.echo("## Applied Fixes")
+        click.echo("")
+        click.echo(f"The following {len(applied_fixes)} fix(es) were automatically applied:")
+        click.echo("")
+        for fix in applied_fixes:
+            click.echo(f"### {fix.description}")
+            click.echo("")
+            click.echo(f"- **File:** `{fix.file_path}`")
+            click.echo(f"- **Changes:** {fix.changes_made}")
+            if fix.backup_path:
+                click.echo(f"- **Backup:** `{fix.backup_path}`")
+            click.echo("")
 
     click.echo("")
     click.echo("---")
